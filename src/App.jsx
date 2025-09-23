@@ -18,7 +18,7 @@ function App() {
     const response = await fetch("https://router.huggingface.co/v1/chat/completions", {
   method: "POST",
   headers: {
-    "Authorization": `Bearer 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`,
+    "Authorization": `Bearer ${process.env.ACCESS_TOKEN}`,
     "Content-Type": "application/json",
   },
   body: JSON.stringify(

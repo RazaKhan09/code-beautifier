@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import './App.css'
@@ -9,11 +9,20 @@ function App() {
   const [bcode,setBcode]= useState("")
   const [style,setStyle]=useState("")
   const [file,setFile]= useState("")
+  const [copied,setCopied]=useState(false)
+  const divref=useRef();
   function cleanMarkdown(text) {
   return text
     .replace(/```[a-zA-Z]*/g, "")  // remove ```jsx or ```ts
     .replace(/```/g, "")           // remove ending fences
     .replace(/^\s*\* /gm, "");     // remove leading * from lists
+}
+function handlecopy(){
+  navigator.clipboard.writeText(bcode)
+  .then(()=>{
+    setCopied(true)
+    setTimeout(()=>setCopied(false),2000)
+  })
 }
   const handleclick=async ()=>{
     const response = await fetch("https://router.huggingface.co/v1/chat/completions", {
@@ -66,6 +75,7 @@ OUTPUT RULES:
 .then((res)=>{
 if(res){
   console.log("Successful fetch")
+  divref.current.style.display="flex"
 }
 else{
   console.log("Failed")
@@ -212,12 +222,23 @@ else{
           disabled:opacity-50 disabled:cursor-not-allowed
           text-sm sm:text-base
         "
-        disabled={style==="" || file===""}
+        disabled={style==="" || file==="" || code===""}
       >
         Beautify
       </button>
     </div>
-
+    <div className='flex justify-between hidden' style={{
+        background: "#1e1e1e",
+        color: "#fff",
+        padding: "10px",
+        borderRadius: "5px",
+      }}
+      ref={divref}
+      >
+        <span>{file}</span>
+        <button className='border' onClick={handlecopy}>{copied==false?"Copy Code":"Copied"}</button>
+    </div>
+    <div className='h-px bg-white'></div>
     <pre
       className="
         whitespace-pre-wrap overflow-x-auto

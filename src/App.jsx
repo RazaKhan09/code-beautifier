@@ -8,6 +8,7 @@ function App() {
   const [code, setCode] = useState("")
   const [bcode,setBcode]= useState("")
   const [style,setStyle]=useState("")
+  const [file,setFile]= useState("")
   function cleanMarkdown(text) {
   return text
     .replace(/```[a-zA-Z]*/g, "")  // remove ```jsx or ```ts
@@ -25,7 +26,34 @@ function App() {
     {messages: [
         {
             role: "user",
-            content: `add ${style} styling to this code: ${code}. Add tailwind css or give a normal css file if the code is html only. Just give the styled code and nothing else.`,
+            content: `You are a code beautifier.
+
+INPUT CODE:
+${code}
+
+REQUIREMENTS:
+- Styling type: ${file}
+- Style theme: ${style}
+
+RULES:
+1. If styling type is "TailwindCSS":
+   - Return the SAME code with Tailwind CSS classes applied.
+   - Apply the chosen theme (${style}) to control color palette, spacing, shadows, borders, and hover effects.
+   - If the code is React/JSX, return JSX with Tailwind classes. If plain HTML, return HTML with Tailwind classes.
+
+2. If styling type is "CSS":
+   - Keep the original HTML structure unchanged.
+   - Return only an external CSS stylesheet that applies the chosen theme (${style}).
+   - Do NOT include <style> tags.
+
+3. If style is "raw":
+   - Return the input code exactly as provided, without changes.
+
+OUTPUT RULES:
+- Do NOT wrap the answer in Markdown backticks.
+- Do NOT add explanations or comments.
+- Return only the final styled code.
+`,
         },
     ],
     model: "openai/gpt-oss-120b:nebius",
@@ -75,24 +103,95 @@ else{
       placeholder="Paste the code here"
       onChange={(e) => setCode(e.target.value)}
     ></textarea>
-    <div className='flex justify-around'>
-        <div>
-          <input type='radio' name="choice" value="modern"  onChange={(e)=>{if(e.target.checked){setStyle(e.target.value)}}}/>
-          <span>Modern</span>
-        </div>
-        <div>
-          <input type='radio' name="choice" value="minimalist" onChange={(e)=>{if(e.target.checked){setStyle(e.target.value)}}}/>
-          <span>Minimalist</span>
-        </div>
-        <div>
-          <input type='radio' name="choice" value="soft" onChange={(e)=>{if(e.target.checked){setStyle(e.target.value)}}}/>
-          <span>Soft</span>
-        </div>
-        <div>
-          <input type='radio' name="choice" value="raw" onChange={(e)=>{if(e.target.checked){setStyle(e.target.value)}}}/>
-          <span>Raw</span>
-        </div>
+    <div className="flex justify-around p-4 bg-white rounded-lg shadow-md">
+      <div className="flex items-center space-x-2">
+        <input
+          value="CSS"
+          type="radio"
+          name="file"
+          onChange={(e) => {
+            if (e.target.checked) {
+            setFile(e.target.value);
+            }
+          }}
+        className="form-radio h-4 w-4 text-blue-600 border-gray-300 focus:ring-2 focus:ring-blue-500"
+        />
+      <span className="text-sm text-gray-800">CSS</span>
     </div>
+  <div className="flex items-center space-x-2">
+    <input
+      value="TailwindCSS"
+      type="radio"
+      name="file"
+      onChange={(e) => {
+        if (e.target.checked) {
+          setFile(e.target.value);
+        }
+      }}
+      className="form-radio h-4 w-4 text-blue-600 border-gray-300 focus:ring-2 focus:ring-blue-500"
+    />
+    <span className="text-sm text-gray-800">TailwindCSS</span>
+  </div>
+</div>
+
+<div className="flex justify-around p-4 bg-white rounded-lg shadow-md mt-4">
+  <div className="flex items-center space-x-2">
+    <input
+      type="radio"
+      name="choice"
+      value="modern"
+      onChange={(e) => {
+        if (e.target.checked) {
+          setStyle(e.target.value);
+        }
+      }}
+      className="form-radio h-4 w-4 text-green-600 border-gray-300 focus:ring-2 focus:ring-green-500"
+    />
+    <span className="text-sm text-gray-800">Modern</span>
+  </div>
+  <div className="flex items-center space-x-2">
+    <input
+      type="radio"
+      name="choice"
+      value="minimalist"
+      onChange={(e) => {
+        if (e.target.checked) {
+          setStyle(e.target.value);
+        }
+      }}
+      className="form-radio h-4 w-4 text-green-600 border-gray-300 focus:ring-2 focus:ring-green-500"
+    />
+    <span className="text-sm text-gray-800">Minimalist</span>
+  </div>
+  <div className="flex items-center space-x-2">
+    <input
+      type="radio"
+      name="choice"
+      value="soft"
+      onChange={(e) => {
+        if (e.target.checked) {
+          setStyle(e.target.value);
+        }
+      }}
+      className="form-radio h-4 w-4 text-green-600 border-gray-300 focus:ring-2 focus:ring-green-500"
+    />
+    <span className="text-sm text-gray-800">Soft</span>
+  </div>
+  <div className="flex items-center space-x-2">
+    <input
+      type="radio"
+      name="choice"
+      value="raw"
+      onChange={(e) => {
+        if (e.target.checked) {
+          setStyle(e.target.value);
+        }
+      }}
+      className="form-radio h-4 w-4 text-green-600 border-gray-300 focus:ring-2 focus:ring-green-500"
+    />
+    <span className="text-sm text-gray-800">Raw</span>
+  </div>
+</div>
 
     <div className="flex justify-center items-center py-4">
       <button
@@ -113,6 +212,7 @@ else{
           disabled:opacity-50 disabled:cursor-not-allowed
           text-sm sm:text-base
         "
+        disabled={style==="" || file===""}
       >
         Beautify
       </button>

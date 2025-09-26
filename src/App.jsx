@@ -75,7 +75,7 @@ OUTPUT RULES:
 .then((res)=>{
 if(res){
   console.log("Successful fetch")
-  divref.current.style.display="flex"
+  // divref.current.style.display="flex"
 }
 else{
   console.log("Failed")
@@ -232,13 +232,14 @@ else{
         color: "#fff",
         padding: "10px",
         borderRadius: "5px",
+        display: bcode===""?"none":"flex"
       }}
       ref={divref}
       >
-        <span>{file}</span>
-        <button className='border' onClick={handlecopy}>{copied==false?"Copy Code":"Copied"}</button>
+        <span className='text-xl'>{file}</span>
+        <button className='border rounded p-0.5' onClick={handlecopy}>{copied==false?"Copy Code":"Copied"}</button>
     </div>
-    <div className='h-px bg-white'></div>
+    <div className='h-px bg-white' style={{display: bcode===""?"none":"block"}}></div>
     <pre
       className="
         whitespace-pre-wrap overflow-x-auto
@@ -249,6 +250,7 @@ else{
         color: "#fff",
         padding: "10px",
         borderRadius: "5px",
+        display: bcode===""?"none":"block"
       }}
     >
       <code>{cleanMarkdown(bcode)}</code>
